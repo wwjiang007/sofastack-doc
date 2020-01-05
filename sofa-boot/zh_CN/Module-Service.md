@@ -31,12 +31,12 @@ SOFABoot 提供三种方式给开发人员发布和引用 JVM 服务
 ```xml
 <sofa:reference interface="com.alipay.sofa.runtime.test.service.SampleService" id="sampleServiceRef">
 	<sofa:binding.jvm/>
-</sofa:service>
+</sofa:reference>
 ```
 
 上面的配置中的 interface 是服务的接口，需要和发布服务时配置的 interface 一致。id 属性的含义同 Spring BeanId。上面的配置会生成一个 id 为 sampleServiceRef 的 Spring Bean，你可以将 sampleServiceRef 这个 Bean 注入到当前 SOFABoot 模块 Spring 上下文的任意地方。
 
-> service/reference 标签还支持 RPC 服务发布，相关文档: [RPC 服务发布与引用](https://github.com/alipay/sofa-rpc/wiki/Publish-And-Reference)
+> service/reference 标签还支持 RPC 服务发布，相关文档: [RPC 服务发布与引用](https://github.com/sofastack/sofa-rpc/wiki/Publish-And-Reference)
 
 ### Annotation 方式
 
@@ -88,6 +88,30 @@ public class SampleServiceRef {
 }
 ```
 
+使用 @SofaService 注解发布服务时，需要在实现类上打上 @SofaService 注解；在 Spring Boot 使用 Bean Method 创建 Bean 时，会导致 @Bean 和 @SofaService 分散在两处，而且无法对同一个实现类使用不同的 unique id。因此自 SOFABoot v2.6.0 及 v3.1.0 版本起，支持 @SofaService 作用在 Bean Method 之上，例如：
+```java
+@Configuration
+public class SampleSofaServiceConfiguration {
+    @Bean("sampleSofaService")
+    @SofaService(uniqueId = "service1")
+    SampleService service() {
+        return new SampleServiceImpl("");
+    }
+}
+```
+
+同样为了方便在 Spring Boot Bean Method 使用注解 @SofaReference 引用服务，自 SOFABoot v2.6.0 及 v3.1.0 版本起，支持在 Bean Method 参数上使用 @SofaReference 注解引用 JVM 服务，例如：
+```java
+@Configuration
+public class MultiSofaReferenceConfiguration {
+    @Bean("sampleReference")
+    TestService service(@Value("$spring.application.name") String appName,
+                        @SofaReference(uniqueId = "service") SampleService service) {
+        return new TestService(service);
+    }
+}
+```
+
 ### 编程 API 方式
 
 SOFABoot 为 JVM 服务的发布和引用提供了一套编程 API 方式，方便直接在代码中发布和引用 JVM 服务，与 Spring 的 ApplicationContextAware 类似，为使用编程 API 方式，首先需要实现 ClientFactoryAware 接口获取编程组件 API：
@@ -135,6 +159,18 @@ SampleService proxy = referenceClient.reference(referenceParam);
 > **提示**
 > 
 > 通过动态客户端创建的 Reference 对象是一个非常重的对象，请大家在使用的时候不要频繁创建，自行做好缓存，否则可能存在内存溢出的风险。
+
+除了实现 ClientFactoryAware 接口用于获取 ServiceClient 和 ReferenceClient 对象，还可以使用简便的注解 `@SofaClientFactory` 获取编程 API，例如
+
+```java
+public class ClientBean {
+    @SofaClientFactory
+    private ReferenceClient referenceClient;
+    
+    @SofaClientFactory
+    private ServiceClient serviceClient;
+}
+```
 
 ### uniqueId
 

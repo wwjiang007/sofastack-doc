@@ -1,5 +1,5 @@
 
-> [工程地址](https://github.com/alipay/sofa-ark/tree/master/sofa-ark-samples/sample-ark-plugin)
+> [工程地址](https://github.com/sofastack/sofa-ark/tree/master/sofa-ark-samples/sample-ark-plugin)
 
 ## 简介
 该样例工程演示了如何借助 `maven` 插件将一个普通的 Java 工程打包成标准格式规范的 `Ark Plugin` 
@@ -10,9 +10,9 @@
 
 * 导出类：其他插件如果导入了该类，优先从本插件加载；
 
-* 导入资源：插件在查找资源时，优先委托给导出改资源的插件负责加载，如果加载不到，才会尝试从本插件内部加载；
+* 导入资源：插件在查找资源时，优先委托给导出该资源的插件负责加载，如果加载不到，才会尝试从本插件内部加载；
 
-* 导入资源：其他插件如果导入了该资源，优先从本插件加载；
+* 导出资源：其他插件如果导入了该资源，优先从本插件加载；
 
 
 > [详细请参考插件规范](./ark-plugin)
@@ -25,7 +25,7 @@
 <plugin>
     <groupId>com.alipay.sofa</groupId>
     <artifactId>sofa-ark-plugin-maven-plugin</artifactId>
-    <version>0.2.0</version>
+    <version>${sofa.ark.version}</version>
 </plugin>
 ```
 
@@ -106,7 +106,39 @@
      <groupId>com.alipay.sofa</groupId>
      <artifactId>sample-ark-plugin</artifactId>
      <classifier>ark-plugin</classifier>
-     <version>0.2.0</version>
+     <version>${sofa.ark.version}</version>
  </dependency>
 ```
 
+### 发布引用插件服务
+在该 Demo 中，演示了如何使用 `PluginContext` 发布插件服务：
+```java
+public class SamplePluginActivator implements PluginActivator {
+
+    public void start(PluginContext context) throws ArkRuntimeException {
+        System.out.println("starting in sample ark plugin activator");
+        context.publishService(SamplePluginService.class, new SamplePluginServiceImpl());
+    }
+
+    public void stop(PluginContext context) throws ArkRuntimeException {
+        System.out.println("stopping in ark plugin activator");
+    }
+}
+```
+
+同时，在服务实现 `SamplePluginServiceImpl` 中演示了如何引用其他插件或者Ark容器发的服务，这里是引用 Ark 容器发布的事件管理服务 `EventAdminService`:
+
+```java
+public class SamplePluginServiceImpl implements SamplePluginService {
+
+    @ArkInject
+    private EventAdminService eventAdminService;
+
+    public String service() {
+        return "I'm a sample plugin service published by ark-plugin";
+    }
+
+    public void sendEvent(ArkEvent arkEvent) {
+        eventAdminService.sendEvent(arkEvent);
+    }
+}

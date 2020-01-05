@@ -1,10 +1,10 @@
-> [工程地址](https://github.com/alipay/sofa-ark/tree/master/sofa-ark-samples/sample-springboot-ark)
+> [工程地址](https://github.com/sofastack/sofa-ark/tree/master/sofa-ark-samples/sample-springboot-ark)
 
 ## 简介
 该样例工程演示了如何借助 `Maven` 插件将一个 Spring Boot Web 工程打包成标准格式规范的可执行 Ark 包；
 
 ## 准备
-因该样例工程依赖 [sample-ark-plugin](https://github.com/alipay/sofa-ark/tree/master/sofa-ark-samples/sample-ark-plugin) , 因此需要提前在本地安装该 `Ark Plugin` 
+因该样例工程依赖 [sample-ark-plugin](https://github.com/sofastack/sofa-ark/tree/master/sofa-ark-samples/sample-ark-plugin) , 因此需要提前在本地安装该 `Ark Plugin` 
 
 ## 工具
 官方提供了 `Maven` 插件 - `sofa-ark-maven-plugin` ，只需要简单的配置项，即可将 Spring Boot Web 工程打包成标准格式规范的可执行 Ark 包，插件坐标为：
@@ -13,7 +13,7 @@
 <plugin>
     <groupId>com.alipay.sofa</groupId>
     <artifactId>sofa-ark-maven-plugin</artifactId>
-    <version>0.2.0</version>
+    <version>${sofa.ark.version}</version>
 </plugin>
 ```
 
@@ -34,7 +34,7 @@
      <groupId>com.alipay.sofa</groupId>
      <artifactId>sample-ark-plugin</artifactId>
      <classifier>ark-plugin</classifier>
-     <version>0.2.0</version>
+     <version>${sofa.ark.version}</version>
  </dependency>
 ```
 
@@ -89,7 +89,7 @@
 <dependency>
     <groupId>com.alipay.sofa</groupId>
     <artifactId>sofa-ark-springboot-starter</artifactId>
-    <version>0.2.0</version>
+    <version>${sofa.ark.version}</version>
 </dependency>
 ```
 
@@ -99,7 +99,7 @@
 <dependency>
     <groupId>com.alipay.sofa</groupId>
     <artifactId>sofa-ark-support-starter</artifactId>
-    <version>0.2.0</version>
+    <version>${sofa.ark.version}</version>
 </dependency>
 ```
 
